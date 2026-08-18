@@ -75,13 +75,12 @@
 
   /* ---------- רינדור ---------- */
   function renderEvent(ev) {
+    var cable = $("cable");
     $("ev-tag").textContent = ev.tag;
     $("ev-title").textContent = ev.title;
     $("ev-text").textContent = ev.text;
-    var cable = $("cable");
-    cable.classList.remove("is-breaking"); void cable.offsetWidth;
-    if (ev.type === "breaking") cable.classList.add("is-breaking");
-    $("cable").querySelector(".cable__stamp-line").textContent =
+    cable.classList.toggle("is-breaking", ev.type === "breaking");
+    cable.querySelector(".cable__stamp-line").textContent =
       ev.type === "breaking" ? "מבזק · לטיפול מיידי" : "מברק · לטיפול";
     var box = $("choices"); box.innerHTML = "";
     ev.choices.forEach(function (c, idx) {
@@ -90,6 +89,7 @@
       b.addEventListener("click", function () { pick(idx); });
       box.appendChild(b);
     });
+    cable.classList.remove("is-enter"); void cable.offsetWidth; cable.classList.add("is-enter");
   }
 
   function renderMeters(animateDelta) {
@@ -127,50 +127,34 @@
       state.meters[k] = clamp(old + (choice.eff[k] || 0) + DRIFT[k]);
       deltas[k] = Math.round(state.meters[k] - old);
     });
-    var dayInc = 12 + rint(22);
-    state.days += dayInc;
+    state.days += 12 + rint(22);
     $("days").textContent = state.days.toLocaleString("he-IL");
 
-    // שלב 1: הטבעות זזות + מספרים עפים
+    // הטבעות זזות + מספרים עפים, ומבזק חולף על המסך
     renderMeters(true);
     flashDeltas(deltas);
-
-    // שלב 2: פאנל "אחרי" אחרי רגע דרמה
-    state.pending = { choice: choice, deltas: deltas, dayInc: dayInc, breaking: state.current.type === "breaking", then: choice.then || null };
-    setTimeout(showAftermath, 820);
+    if (choice.then) state.forcedNext = choice.then;
+    newsflash(choice.out || "וכך זה נמשך.", state.current.type === "breaking");
+    setTimeout(proceed, 2050);
   }
 
-  function showAftermath() {
-    var p = state.pending;
-    $("cable").style.display = "none";     // התגובה תופסת את מקום כרטיס האירוע
-    var lbl = $("after-label");
-    lbl.textContent = p.breaking ? "מבזק" : "הבוקר שאחרי";
-    lbl.className = "aftermath__label" + (p.breaking ? "" : " calm");
-    $("after-head").textContent = p.choice.out || "וכך זה נמשך.";
-    var box = $("after-deltas"); box.innerHTML = "";
-    METERS.forEach(function (k) {
-      var d = p.deltas[k];
-      var chip = document.createElement("span");
-      chip.className = "after-chip " + (d > 0 ? "up" : d < 0 ? "down" : "zero");
-      chip.textContent = NAMES[k] + " " + (d > 0 ? "+" : "") + d;
-      box.appendChild(chip);
-    });
-    $("after-days").textContent = "עברו " + p.dayInc + " ימים · סה\"כ " + state.days.toLocaleString("he-IL") + " בשלטון";
-    $("aftermath").classList.add("is-on");
+  function newsflash(text, breaking) {
+    $("nf-label").textContent = breaking ? "מבזק" : "הבוקר שאחרי";
+    $("nf-text").textContent = text;
+    var el = $("newsflash");
+    el.classList.remove("is-on", "breaking");
+    if (breaking) el.classList.add("breaking");
+    void el.offsetWidth;
+    el.classList.add("is-on");
   }
 
-  function resolveAftermath() {
-    $("aftermath").classList.remove("is-on");
-    $("cable").style.display = "";          // הכרטיס חוזר לאירוע הבא
-    var p = state.pending; state.pending = null;
-    if (p.then) state.forcedNext = p.then;
-
+  function proceed() {
+    $("newsflash").classList.remove("is-on");
     var dead = deadMeter();
-    if (dead) { state.cause = dead; setTimeout(function () { endGame(dead); }, 260); return; }
-
+    if (dead) { state.cause = dead; setTimeout(function () { endGame(dead); }, 200); return; }
     var ms = crossedMilestone();
     if (ms) { showMilestone(ms); return; }
-    setTimeout(nextTurn, 200);
+    nextTurn();
   }
 
   function deadMeter() {
@@ -251,7 +235,6 @@
   document.addEventListener("DOMContentLoaded", function () {
     $("btn-start").addEventListener("click", newGame);
     $("btn-again").addEventListener("click", newGame);
-    $("btn-continue").addEventListener("click", resolveAftermath);
     $("btn-share").addEventListener("click", doShare);
   });
 })();
