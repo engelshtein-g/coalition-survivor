@@ -1,0 +1,169 @@
+/* ===== שרוד את הקואליציה — עיצוב "אפליקציה רכה מודרנית" ===== */
+:root{
+  --bg:#eef0f5;
+  --card:#ffffff;
+  --ink:#1e2233;
+  --ink-soft:#697089;
+  --ink-mute:#8a90a6;
+  --indigo:#5b5bd6;
+  --indigo-deep:#4a49c4;
+  --indigo-soft:#eceafe;
+  --track:#eceef4;
+  --field:#f5f6fa;
+  --line:#e7e9f2;
+  --c-coalition:#22c493;
+  --c-public:#4d8dff;
+  --c-budget:#f5a524;
+  --danger:#ef4d6b;
+  --radius:22px;
+  --radius-md:18px;
+  --radius-sm:14px;
+  --shadow:0 16px 38px -20px rgba(30,34,51,.5);
+  --shadow-sm:0 8px 20px -14px rgba(30,34,51,.42);
+  --sans:"Rubik",system-ui,sans-serif;
+  --body:"Heebo",system-ui,sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--body);color:var(--ink);
+  background:
+    radial-gradient(120% 80% at 50% -10%, #f4f5fb 0%, var(--bg) 55%);
+  min-height:100dvh;line-height:1.55;-webkit-font-smoothing:antialiased;
+}
+
+.frame{max-width:440px;margin-inline:auto;padding:clamp(14px,4vw,22px) clamp(12px,4vw,18px) 42px;min-height:100dvh;display:flex}
+
+/* ===== screens ===== */
+.screen{display:none;width:100%;animation:rise .45s cubic-bezier(.2,.7,.2,1) both}
+.screen.is-active{display:flex;flex-direction:column;justify-content:center}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ===== buttons ===== */
+.btn{
+  font-family:var(--sans);font-weight:600;font-size:16px;
+  border:0;cursor:pointer;padding:15px 18px;width:100%;
+  border-radius:var(--radius-sm);
+  transition:transform .12s ease,background .18s ease,box-shadow .18s ease;
+}
+.btn--primary{background:var(--indigo);color:#fff;box-shadow:0 10px 22px -12px rgba(91,91,214,.8)}
+.btn--primary:hover{background:var(--indigo-deep);transform:translateY(-2px)}
+.btn--primary:active{transform:translateY(0)}
+.btn--ghost{background:var(--field);color:var(--ink);border:1px solid var(--line)}
+.btn--ghost:hover{background:#eef0f7}
+.btn:focus-visible{outline:3px solid var(--indigo);outline-offset:3px}
+
+/* ===== מסך פתיחה ===== */
+.dossier{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:34px 26px 26px;text-align:center;position:relative}
+.dossier__tab{
+  display:inline-block;background:var(--indigo-soft);color:var(--indigo);
+  font-family:var(--sans);font-weight:600;font-size:12px;letter-spacing:.02em;
+  padding:6px 14px;border-radius:99px;margin-bottom:16px;
+}
+.masthead{margin-bottom:20px}
+.emblem{width:60px;height:60px;color:var(--indigo);margin-bottom:6px}
+.masthead__kicker{font-size:12.5px;color:var(--ink-mute);font-weight:500;margin-bottom:6px}
+.masthead__title{font-family:var(--sans);font-weight:800;font-size:clamp(34px,10vw,44px);line-height:1.02;letter-spacing:-.01em;margin-bottom:12px}
+.masthead__file{font-size:12px;color:var(--ink-mute);font-variant-numeric:tabular-nums}
+.briefing{text-align:start;font-size:15.5px;color:var(--ink-soft);display:grid;gap:9px;margin-bottom:22px;background:var(--field);border-radius:var(--radius-md);padding:18px}
+.briefing__lead{font-family:var(--sans);font-weight:700;font-size:19px;color:var(--ink)}
+.briefing__ask{border-top:1px solid var(--line);padding-top:11px;margin-top:3px;color:var(--ink)}
+.briefing b{color:var(--indigo);font-weight:700}
+.foot-note{font-size:11.5px;color:var(--ink-mute);margin-top:16px;line-height:1.6}
+
+/* ===== מד ימים ===== */
+.daybar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--card);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);
+  padding:13px 18px;margin-bottom:12px;
+}
+.daybar__label{font-size:13px;color:var(--ink-mute);font-weight:500}
+.daybar__count{font-family:var(--sans);font-size:30px;font-weight:700;color:var(--indigo);font-variant-numeric:tabular-nums;line-height:1}
+
+/* ===== מדים (טבעות) ===== */
+.gauges{background:var(--card);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);padding:18px 12px 16px;display:flex;justify-content:space-around;gap:6px;margin-bottom:12px}
+.gauge{text-align:center;position:relative}
+.ring-delta{position:absolute;top:-4px;left:50%;transform:translateX(-50%);font-family:var(--sans);font-weight:700;font-size:14px;opacity:0;pointer-events:none;z-index:5;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.ring-delta.up{color:#0f8f63;background:rgba(34,196,147,.18)}
+.ring-delta.down{color:#d63a57;background:rgba(239,77,107,.18)}
+.ring-delta.show{animation:deltaFloat 1.3s ease-out both}
+@keyframes deltaFloat{0%{opacity:0;transform:translate(-50%,6px) scale(.8)}22%{opacity:1;transform:translate(-50%,-4px) scale(1)}70%{opacity:1;transform:translate(-50%,-14px)}100%{opacity:0;transform:translate(-50%,-26px)}}
+.ring__val{transform-box:fill-box;transform-origin:center}
+.ring__val.bump{animation:bump .45s ease}
+@keyframes bump{45%{transform:scale(1.16)}}
+.ring{width:clamp(76px,23vw,88px);height:clamp(76px,23vw,88px);display:block;margin:0 auto 7px}
+.ring__track{fill:none;stroke:var(--track);stroke-width:8}
+.ring__prog{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:201.06;stroke-dashoffset:90;transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1),stroke .3s ease}
+.ring__val{font-family:var(--sans);font-weight:700;font-size:22px;fill:var(--ink)}
+.gauge[data-meter="coalition"] .ring__prog{stroke:var(--c-coalition)}
+.gauge[data-meter="public"] .ring__prog{stroke:var(--c-public)}
+.gauge[data-meter="budget"] .ring__prog{stroke:var(--c-budget)}
+.gauge.is-low .ring__prog{stroke:var(--danger);animation:pulse 1.1s ease-in-out infinite}
+.gauge.is-low .ring__val{fill:var(--danger)}
+.gauge__name{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12.5px;font-weight:500;color:var(--ink-soft)}
+.gauge__icon{width:15px;height:15px;color:var(--ink-mute);flex:none}
+@keyframes pulse{50%{opacity:.5}}
+
+/* ===== מברק / כרטיס משבר ===== */
+.cable{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 20px 20px}
+.cable__meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+.cable__tag{background:var(--indigo-soft);color:var(--indigo);font-family:var(--sans);font-size:12px;font-weight:600;padding:4px 12px;border-radius:99px}
+.cable__stamp-line{font-size:11px;color:var(--ink-mute)}
+.cable__title{font-family:var(--sans);font-weight:700;font-size:clamp(21px,5.6vw,24px);line-height:1.2;margin-bottom:9px}
+.cable__text{font-size:15.5px;color:var(--ink-soft);margin-bottom:18px}
+.choices{display:grid;gap:9px}
+.choice{
+  text-align:start;width:100%;font-family:var(--body);
+  background:var(--field);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:14px 16px;font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;
+  transition:background .15s ease,color .15s ease,border-color .15s ease,transform .1s ease;
+}
+.choice:hover{background:var(--indigo);color:#fff;border-color:var(--indigo);transform:translateY(-1px)}
+.choice:focus-visible{outline:3px solid var(--indigo);outline-offset:2px}
+
+/* ===== מבזק (אירוע חריג) ===== */
+.cable.is-breaking{animation:flash .6s ease}
+.cable.is-breaking .cable__tag{background:var(--danger);color:#fff}
+@keyframes flash{0%,100%{box-shadow:var(--shadow)}45%{box-shadow:0 0 0 4px rgba(239,77,107,.3),var(--shadow)}}
+
+/* ===== פאנל "אחרי ההחלטה" — כרטיס במקום האירוע ===== */
+.aftermath{display:none}
+.aftermath.is-on{display:block}
+.aftermath__card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 20px 20px;text-align:center;animation:rise .32s cubic-bezier(.2,.8,.2,1) both}
+.aftermath__label{display:inline-block;background:var(--danger);color:#fff;font-family:var(--sans);font-weight:700;font-size:11px;letter-spacing:.12em;padding:4px 13px;border-radius:99px;margin-bottom:13px}
+.aftermath__label.calm{background:var(--indigo)}
+.aftermath__head{font-family:var(--sans);font-weight:700;font-size:19px;line-height:1.32;margin-bottom:16px}
+.aftermath__deltas{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.after-chip{font-family:var(--sans);font-weight:600;font-size:12.5px;padding:6px 12px;border-radius:99px;background:var(--field)}
+.after-chip.up{color:#0f8f63}.after-chip.down{color:#d63a57}.after-chip.zero{color:var(--ink-mute)}
+.aftermath__days{font-size:13px;color:var(--ink-mute);margin-bottom:18px}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ===== אבן דרך ===== */
+.milestone{position:fixed;inset:0;z-index:60;display:none;place-items:center;background:linear-gradient(160deg,var(--indigo),#7a5bd6);color:#fff;text-align:center;padding:24px}
+.milestone.is-on{display:grid;animation:fadeIn .25s ease}
+.milestone__card{animation:msPop .55s cubic-bezier(.2,.9,.2,1) both}
+.milestone__num{font-family:var(--sans);font-weight:800;font-size:clamp(64px,20vw,84px);line-height:1}
+.milestone__text{font-size:16px;font-weight:500;opacity:.92;margin-top:4px}
+@keyframes msPop{0%{transform:scale(.6);opacity:0}62%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+
+/* ===== תעודת סיום ===== */
+.certificate{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:34px 26px 26px;text-align:center}
+.certificate__seal{width:60px;height:60px;color:var(--indigo);margin:0 auto 10px}
+.certificate__seal svg{width:100%;height:100%}
+.certificate__kicker{font-size:12.5px;color:var(--ink-mute);font-weight:500;margin-bottom:6px}
+.certificate__verdict{font-family:var(--sans);font-weight:800;font-size:clamp(26px,7.5vw,32px);color:var(--danger);margin-bottom:8px}
+.certificate__reason{font-size:15px;color:var(--ink-soft);margin-bottom:22px;min-height:1.2em}
+.certificate__score{background:var(--field);border-radius:var(--radius-md);padding:20px 0;margin-bottom:14px;display:grid;gap:3px}
+.certificate__rank{font-size:14.5px;color:var(--ink-soft);margin-bottom:20px;line-height:1.45}
+.certificate__num{font-family:var(--sans);font-size:54px;font-weight:800;line-height:1;color:var(--indigo);font-variant-numeric:tabular-nums}
+.certificate__unit{font-size:13px;color:var(--ink-mute);font-weight:500}
+.certificate__title-line{font-size:13px;color:var(--ink-mute);margin-bottom:3px}
+.certificate__title{font-family:var(--sans);font-weight:700;font-size:24px;color:var(--indigo);margin-bottom:24px}
+.certificate__actions{display:grid;gap:10px}
+
+/* ===== a11y / motion ===== */
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.08s!important}}
+@media (max-width:360px){.masthead__title{font-size:32px}.certificate__num{font-size:46px}}

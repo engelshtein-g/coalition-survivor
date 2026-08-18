@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>שרוד את הקואליציה</title>
+<meta name="description" content="קיבלת ממשלה. כמה זמן תחזיק אותה? משחק הישרדות פוליטי." />
+<meta name="theme-color" content="#14202a" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ====== סמלים (SVG sprite) ====== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- אמבלם המדינה (סאטירי): מנורה/ענף זית בתוך חותם -->
+    <symbol id="i-seal" viewBox="0 0 48 48">
+      <circle cx="24" cy="24" r="21" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <circle cx="24" cy="24" r="17.5" fill="none" stroke="currentColor" stroke-width="0.8"/>
+      <path d="M24 14v18M17 20v9M31 20v9M20.5 17v12M27.5 17v12" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M15 32h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M13 34c3 2 5 2 5 2M35 34c-3 2-5 2-5 2" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    </symbol>
+    <!-- קואליציה: לחיצת יד -->
+    <symbol id="i-coalition" viewBox="0 0 24 24">
+      <path d="M2 9l4-2 5 3 3-1 8 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M11 10l2.5 2.2c.7.6 1.7.5 2.2-.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M22 8l-4 8-3 1-4-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <!-- ציבור: קהל -->
+    <symbol id="i-public" viewBox="0 0 24 24">
+      <circle cx="7" cy="8" r="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <circle cx="17" cy="8" r="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <circle cx="12" cy="6.5" r="2.7" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M3 19c0-3 2-4.5 4-4.5M21 19c0-3-2-4.5-4-4.5M7.5 20c0-3.5 2-5.5 4.5-5.5s4.5 2 4.5 5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </symbol>
+    <!-- תקציב: שקל -->
+    <symbol id="i-budget" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M8.5 8.5v7c1.6 0 3-.4 3-2.6V8.6M15.5 15.5v-7c-1.6 0-3 .4-3 2.6v3.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="frame">
+
+  <!-- ====== מסך פתיחה ====== -->
+  <section id="screen-start" class="screen is-active">
+    <div class="dossier">
+      <div class="dossier__tab">תיק&nbsp;חסוי</div>
+      <header class="masthead">
+        <svg class="emblem" aria-hidden="true"><use href="#i-seal"/></svg>
+        <p class="masthead__kicker">מדינת ישראל · לשכת ראש הממשלה</p>
+        <h1 class="masthead__title">שרוד את<br>הקואליציה</h1>
+        <p class="masthead__file">תיק מס׳ <span id="case-no">00-0000</span></p>
+      </header>
+      <div class="briefing">
+        <p class="briefing__lead">הרכבת ממשלה. מזל טוב.</p>
+        <p>מהיום, כל החלטה מזיזה שלושה דברים: <b>הקואליציה</b>, <b>הציבור</b>, וה<b>תקציב</b>. אם אחד מהם מתאפס — <b>הממשלה נופלת.</b></p>
+        <p class="briefing__ask">השאלה היחידה שחשובה: <b>כמה ימים תחזיק?</b></p>
+      </div>
+      <button class="btn btn--primary" id="btn-start">מקבל את האתגר</button>
+      <p class="foot-note">אזהרה: כל דמיון לממשלה מכהנת הוא מקרי לחלוטין ובלתי נמנע.</p>
+    </div>
+  </section>
+
+  <!-- ====== מסך משחק ====== -->
+  <section id="screen-play" class="screen">
+    <!-- מד ימים -->
+    <div class="daybar">
+      <span class="daybar__label">ימים בשלטון</span>
+      <span class="daybar__count" id="days">0</span>
+    </div>
+
+    <!-- מדים -->
+    <div class="gauges">
+      <div class="gauge" data-meter="coalition">
+        <span class="ring-delta" id="delta-coalition"></span>
+        <svg class="ring" viewBox="0 0 88 88" aria-hidden="true">
+          <circle class="ring__track" cx="44" cy="44" r="32"/>
+          <circle class="ring__prog" id="ring-coalition" cx="44" cy="44" r="32" transform="rotate(-90 44 44)"/>
+          <text class="ring__val" id="val-coalition" x="44" y="52" text-anchor="middle">55</text>
+        </svg>
+        <div class="gauge__name"><svg class="gauge__icon"><use href="#i-coalition"/></svg><span>קואליציה</span></div>
+      </div>
+      <div class="gauge" data-meter="public">
+        <span class="ring-delta" id="delta-public"></span>
+        <svg class="ring" viewBox="0 0 88 88" aria-hidden="true">
+          <circle class="ring__track" cx="44" cy="44" r="32"/>
+          <circle class="ring__prog" id="ring-public" cx="44" cy="44" r="32" transform="rotate(-90 44 44)"/>
+          <text class="ring__val" id="val-public" x="44" y="52" text-anchor="middle">55</text>
+        </svg>
+        <div class="gauge__name"><svg class="gauge__icon"><use href="#i-public"/></svg><span>ציבור</span></div>
+      </div>
+      <div class="gauge" data-meter="budget">
+        <span class="ring-delta" id="delta-budget"></span>
+        <svg class="ring" viewBox="0 0 88 88" aria-hidden="true">
+          <circle class="ring__track" cx="44" cy="44" r="32"/>
+          <circle class="ring__prog" id="ring-budget" cx="44" cy="44" r="32" transform="rotate(-90 44 44)"/>
+          <text class="ring__val" id="val-budget" x="44" y="52" text-anchor="middle">55</text>
+        </svg>
+        <div class="gauge__name"><svg class="gauge__icon"><use href="#i-budget"/></svg><span>תקציב</span></div>
+      </div>
+    </div>
+
+    <!-- מברק המשבר -->
+    <article class="cable" id="cable">
+      <div class="cable__meta">
+        <span class="cable__tag" id="ev-tag">קואליציה</span>
+        <span class="cable__stamp-line">מברק דחוף · לטיפול מיידי</span>
+      </div>
+      <h2 class="cable__title" id="ev-title">—</h2>
+      <p class="cable__text" id="ev-text">—</p>
+      <div class="choices" id="choices"></div>
+    </article>
+
+    <!-- אחרי ההחלטה -->
+    <div class="aftermath" id="aftermath" aria-hidden="true">
+      <div class="aftermath__card">
+        <span class="aftermath__label" id="after-label">מבזק</span>
+        <p class="aftermath__head" id="after-head">—</p>
+        <div class="aftermath__deltas" id="after-deltas"></div>
+        <p class="aftermath__days" id="after-days">—</p>
+        <button class="btn btn--primary" id="btn-continue">המשך</button>
+      </div>
+    </div>
+
+    <!-- אבן דרך -->
+    <div class="milestone" id="milestone" aria-hidden="true">
+      <div class="milestone__card">
+        <p class="milestone__num" id="ms-num">100</p>
+        <p class="milestone__text" id="ms-text">ימים בשלטון</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== מסך סיום ====== -->
+  <section id="screen-end" class="screen">
+    <div class="certificate">
+      <div class="certificate__seal"><svg aria-hidden="true"><use href="#i-seal"/></svg></div>
+      <p class="certificate__kicker">הודעה רשמית · סוף כהונה</p>
+      <h2 class="certificate__verdict" id="end-cause">הממשלה נפלה</h2>
+      <p class="certificate__reason" id="end-reason">—</p>
+      <div class="certificate__score">
+        <span class="certificate__num" id="end-days">0</span>
+        <span class="certificate__unit">ימים בשלטון</span>
+      </div>
+      <p class="certificate__rank" id="end-rank">—</p>
+      <p class="certificate__title-line">התואר שנחרט לך בהיסטוריה:</p>
+      <p class="certificate__title" id="end-title">—</p>
+      <div class="certificate__actions">
+        <button class="btn btn--primary" id="btn-share">משתף את התוצאה</button>
+        <button class="btn btn--ghost" id="btn-again">מרכיב ממשלה חדשה</button>
+      </div>
+      <p class="foot-note" id="share-hint"></p>
+    </div>
+  </section>
+
+</div>
+
+<script src="events.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
