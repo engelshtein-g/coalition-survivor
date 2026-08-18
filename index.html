@@ -8,8 +8,8 @@
 <meta name="theme-color" content="#14202a" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css" />
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=Rubik:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css?v=2" />
 </head>
 <body>
 
@@ -117,10 +117,19 @@
       <div class="choices" id="choices"></div>
     </article>
 
-    <!-- מבזק שעף על המסך אחרי החלטה -->
-    <div class="newsflash" id="newsflash" aria-hidden="true">
-      <span class="newsflash__label" id="nf-label">מבזק</span>
-      <span class="newsflash__text" id="nf-text">—</span>
+    <!-- כותרת עיתון אחרי החלטה -->
+    <div class="paper" id="newsflash" aria-hidden="true">
+      <div class="paper__card">
+        <div class="paper__masthead">
+          <span class="paper__name">הַמַּבָּט</span>
+          <span class="paper__date" id="nf-date">—</span>
+        </div>
+        <span class="paper__kicker" id="nf-label">מבזק</span>
+        <h2 class="paper__headline" id="nf-text">—</h2>
+        <div class="paper__rule"></div>
+        <p class="paper__sub" id="nf-sub">—</p>
+        <p class="paper__tap">לחץ להמשך</p>
+      </div>
     </div>
 
     <!-- אבן דרך -->
@@ -156,7 +165,7 @@
 
 </div>
 
-<script src="events.js"></script>
-<script src="game.js"></script>
+<script src="events.js?v=2"></script>
+<script src="game.js?v=2"></script>
 </body>
 </html>

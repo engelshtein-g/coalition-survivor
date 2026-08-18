@@ -134,13 +134,17 @@
     renderMeters(true);
     flashDeltas(deltas);
     if (choice.then) state.forcedNext = choice.then;
-    newsflash(choice.out || "וכך זה נמשך.", state.current.type === "breaking");
-    setTimeout(proceed, 2050);
+    newsflash(choice.out || "וכך זה נמשך.", state.current.type === "breaking", deltas);
+    state.nfTimer = setTimeout(proceed, 2700);
   }
 
-  function newsflash(text, breaking) {
-    $("nf-label").textContent = breaking ? "מבזק" : "הבוקר שאחרי";
+  function newsflash(text, breaking, deltas) {
+    $("nf-label").textContent = breaking ? "מבזק" : "עדכון";
     $("nf-text").textContent = text;
+    $("nf-date").textContent = "יום " + state.days.toLocaleString("he-IL") + " לכהונה";
+    $("nf-sub").textContent = METERS.map(function (k) {
+      var v = deltas[k]; return NAMES[k] + " " + (v > 0 ? "+" : "") + v;
+    }).join("   ·   ");
     var el = $("newsflash");
     el.classList.remove("is-on", "breaking");
     if (breaking) el.classList.add("breaking");
@@ -149,7 +153,10 @@
   }
 
   function proceed() {
-    $("newsflash").classList.remove("is-on");
+    var el = $("newsflash");
+    if (!el.classList.contains("is-on")) return; // כבר טופל (למניעת קליק+טיימר כפולים)
+    clearTimeout(state.nfTimer);
+    el.classList.remove("is-on");
     var dead = deadMeter();
     if (dead) { state.cause = dead; setTimeout(function () { endGame(dead); }, 200); return; }
     var ms = crossedMilestone();
@@ -234,7 +241,8 @@
   /* ---------- חיבור ---------- */
   document.addEventListener("DOMContentLoaded", function () {
     $("btn-start").addEventListener("click", newGame);
-    $("btn-again").addEventListener("click", newGame);
+    $("btn-again").addEventListener("click", function () { show("screen-start"); });
     $("btn-share").addEventListener("click", doShare);
+    $("newsflash").addEventListener("click", proceed);
   });
 })();
