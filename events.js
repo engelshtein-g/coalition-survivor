@@ -139,7 +139,7 @@ const EVENTS = [
     text: 'זוג צעיר בטלוויזיה מספר שהם גרים אצל ההורים בגיל 34. הראיון ויראלי. אתה מוזכר.',
     choices: [
       { label: 'משיק תוכנית דיור', eff:{coalition:-4,public:18,budget:-20}, out:'תקווה עלתה. וגם הגירעון.' },
-      { label: '"תלכו לפריפריה"', eff:{coalition:2,public:-18,budget:0}, out:'הפריפריה גם נעלבה.' },
+      { label: '"תלכו לפריפריה"', eff:{coalition:2,public:-18,budget:0}, out:'גם הפריפריה ענתה: "בואו אתם."' },
       { label: 'מבטיח ועדת דיור', eff:{coalition:0,public:-6,budget:-2}, out:'הוועדה ה-14 לדיור. מזל טוב.' },
     ],
   },
@@ -189,7 +189,7 @@ const EVENTS = [
     text: 'סקר חדש: המפלגה שלך מתרסקת. הפרשנים כבר מציירים גרפים אדומים. הטלפון מלא.',
     choices: [
       { label: 'משיק "מהלך דרמטי"', eff:{coalition:-8,public:14,budget:-10}, out:'הדרמה עבדה. לשבוע.' },
-      { label: '"סקרים לא מעניינים אותי"', eff:{coalition:2,public:-8,budget:0}, out:'ברור שלא. בכלל לא.' },
+      { label: '"סקרים לא מעניינים אותי"', eff:{coalition:2,public:-8,budget:0}, out:'אמר, וריענן את העמוד.' },
       { label: 'מזמין סקר נגדי', eff:{coalition:2,public:-4,budget:-3}, out:'הסקר שלך אמר שאתה מנצח. מוזר.' },
     ],
   },
@@ -268,7 +268,7 @@ const EVENTS = [
     text: 'המורים שובתים, מיליון ילדים בבית, ומיליון הורים מחפשים אשם. מצאו אותך.',
     choices: [
       { label: 'מעלה שכר מורים', eff:{coalition:-6,public:18,budget:-20}, out:'הכיתות חזרו. הקופה נאנחה.' },
-      { label: 'מציע "רפורמה" במקום כסף', eff:{coalition:4,public:-6,budget:-2}, out:'רפורמה זו לא משכורת, גילו.' },
+      { label: 'מציע "רפורמה" במקום כסף', eff:{coalition:4,public:-6,budget:-2}, out:'"רפורמה" זו מילה יוקרתית ל"אין תקציב".' },
       { label: 'מטיל אחריות על הרשויות', eff:{coalition:2,public:-10,budget:0}, out:'הרשויות החזירו לך את הכדור.' },
     ],
   },
@@ -330,6 +330,56 @@ const EVENTS = [
       { label: 'מקרב אותו ומחבק', eff:{coalition:8,public:2,budget:-4}, out:'"אחדות". שניכם יודעים שלא.' },
       { label: 'מנטרל אותו בשקט', eff:{coalition:-8,public:-4,budget:0}, out:'הוא הבין. עכשיו הוא זהיר וכועס.' },
       { label: 'מתעלם, "אני עסוק במדינה"', eff:{coalition:-4,public:6,budget:0}, out:'התעלמות. הסקר הבא יחליט.' },
+    ],
+  },
+  {
+    id: 'austerity', tag: 'כלכלה',
+    title: 'תוכנית צנע',
+    text: 'האוצר מניח תוכנית קיצוצים שתמלא את הקופה — ותרוקן את הסבלנות של הציבור. יש בה 40 סעיפים, כולם כואבים.',
+    choices: [
+      { label: 'מאשר את מלוא הקיצוצים', eff:{coalition:2,public:-18,budget:22}, out:'הקופה התאוששה. הרחוב פחות.' },
+      { label: 'קיצוץ מתון וסלקטיבי', eff:{coalition:0,public:-6,budget:10}, out:'חצי צנע, חצי כאב.' },
+      { label: 'דוחה — "לא על גב הציבור"', eff:{coalition:-4,public:10,budget:-6}, out:'פופולרי. גם יקר.' },
+    ],
+  },
+  {
+    id: 'bond_sale', tag: 'כלכלה',
+    title: 'הנפקת אג״ח',
+    text: 'ראש בנק ישראל מציע לגייס כסף בשוק ההון עכשיו, בריבית סבירה. מחר אולי כבר לא.',
+    choices: [
+      { label: 'מגייס בגדול', eff:{coalition:2,public:-2,budget:20}, out:'הקופה מלאה. החוב גם.' },
+      { label: 'גיוס זהיר', eff:{coalition:0,public:0,budget:10}, out:'מדוד, אחראי, משעמם. מצוין.' },
+      { label: 'מוותר — "לא נתמכר לחוב"', eff:{coalition:-2,public:4,budget:-4}, out:'עקרוני. גם ריק.' },
+    ],
+  },
+  {
+    id: 'privatize', tag: 'כלכלה',
+    title: 'הפרטת חברה ממשלתית',
+    text: 'קרן זרה מציעה סכום נאה על נמל/חברת חשמל/מונופול ותיק. העובדים כבר מכינים אוהל מחאה.',
+    choices: [
+      { label: 'מוכר — הכסף מדבר', eff:{coalition:4,public:-14,budget:18}, out:'הקופה מרוצה. הוועד פחות.' },
+      { label: 'מפריט חלקית', eff:{coalition:0,public:-6,budget:9}, out:'חצי מכרת, חצי מחאה.' },
+      { label: '"נכס לאומי, לא למכירה"', eff:{coalition:-4,public:10,budget:-4}, out:'הצלת את הנכס. לא את התקציב.' },
+    ],
+  },
+  {
+    id: 'nonapology', tag: 'משפט', type:'breaking',
+    title: 'המחדל',
+    text: 'קרה כשל גדול, וכולם מסתכלים עליך. הניסוח של מה שתגיד עכשיו ילווה אותך שנים.',
+    choices: [
+      { label: '"אני אחראי — אבל לא אשם"', eff:{coalition:6,public:-8,budget:0}, out:'הניסוח נכנס להיסטוריה. לרעה.' },
+      { label: 'לוקח אחריות מלאה', eff:{coalition:-10,public:16,budget:0}, out:'נדיר. הרחוב המום לטובה.' },
+      { label: 'ממנה ועדה שתבדוק אותך', eff:{coalition:2,public:-10,budget:-2}, out:'תחקור את עצמך. בהצלחה.' },
+    ],
+  },
+  {
+    id: 'gov_chatbot', tag: 'רחוב',
+    title: 'בינה מלאכותית בשירות הציבור',
+    text: 'השקת צ׳אטבוט ממשלתי שיחליף פקידים. תוך יומיים הוא ענה לאזרחים בציניות מטרידה.',
+    choices: [
+      { label: 'סוגר את הצ׳אטבוט', eff:{coalition:0,public:8,budget:-6}, out:'הצ׳אטבוט התפטר קודם. גם לו יש כבוד.' },
+      { label: '"תקלה זמנית, נתקן"', eff:{coalition:2,public:-6,budget:-2}, out:'הצ׳אטבוט ענה: "בטח."' },
+      { label: 'מרחיב אותו למשרדים נוספים', eff:{coalition:4,public:-12,budget:8}, out:'עכשיו כל המדינה עונה בציניות.' },
     ],
   },
 ];

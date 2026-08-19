@@ -141,7 +141,8 @@ body{
 .paper.breaking .paper__kicker{background:var(--danger)}
 .paper__headline{font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:clamp(24px,7vw,30px);line-height:1.12;margin-bottom:12px}
 .paper__rule{height:1px;background:#cabfa6;margin-bottom:10px}
-.paper__sub{font-family:"Heebo",sans-serif;font-size:13.5px;color:#4a4436;font-weight:600;margin-bottom:13px}
+.paper__sub{font-family:"Heebo",sans-serif;font-size:13.5px;color:#4a4436;font-weight:600;margin-bottom:8px}
+.paper__drift{font-family:"Heebo",sans-serif;font-size:10.5px;color:#a39a82;font-style:italic;text-align:center;margin-bottom:11px;line-height:1.4}
 .paper__tap{font-family:"Heebo",sans-serif;font-size:11px;color:#9a927c;text-align:center;letter-spacing:.05em}
 @keyframes slapIn{0%{opacity:0;transform:scale(1.5) rotate(-6deg)}55%{opacity:1;transform:scale(.97) rotate(1.5deg)}75%{transform:scale(1.01) rotate(-.5deg)}100%{transform:scale(1) rotate(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -162,7 +163,8 @@ body{
 .certificate__verdict{font-family:var(--sans);font-weight:800;font-size:clamp(26px,7.5vw,32px);color:var(--danger);margin-bottom:8px}
 .certificate__reason{font-size:15px;color:var(--ink-soft);margin-bottom:22px;min-height:1.2em}
 .certificate__score{background:var(--field);border-radius:var(--radius-md);padding:20px 0;margin-bottom:14px;display:grid;gap:3px}
-.certificate__rank{font-size:14.5px;color:var(--ink-soft);margin-bottom:20px;line-height:1.45}
+.certificate__rank{font-size:14.5px;color:var(--ink-soft);margin-bottom:10px;line-height:1.45}
+.certificate__stats{font-size:12.5px;color:var(--ink-mute);font-weight:600;margin-bottom:20px;line-height:1.5}
 .certificate__num{font-family:var(--sans);font-size:54px;font-weight:800;line-height:1;color:var(--indigo);font-variant-numeric:tabular-nums}
 .certificate__unit{font-size:13px;color:var(--ink-mute);font-weight:500}
 .certificate__title-line{font-size:13px;color:var(--ink-mute);margin-bottom:3px}

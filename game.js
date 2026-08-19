@@ -4,7 +4,7 @@
 
   var RING_C = 2 * Math.PI * 32;                 // היקף הטבעת (~201.06)
   var START = 55, LOW = 22;
-  var DRIFT = { coalition: -2, public: -3, budget: -3 }; // שחיקת שלטון
+  var DRIFT = { coalition: -3, public: -3, budget: -2 }; // שחיקת שלטון (קואליציה נשחקת הכי מהר)
   var METERS = ["coalition", "public", "budget"];
   var NAMES = { coalition: "קואליציה", public: "ציבור", budget: "תקציב" };
   var MILESTONES = [
@@ -171,6 +171,7 @@
     if (m.coalition <= 0) return "coalition";
     if (m.public <= 0) return "public";
     if (m.budget <= 0) return "budget";
+    if (m.coalition >= 96) return "overreach"; // חזק מדי → מפוצץ לבחירות מוקדמות בביטחון יתר
     return null;
   }
 
@@ -199,14 +200,29 @@
   var CAUSE = {
     coalition: { verdict: "הקואליציה התפרקה", reason: "השותפים לקחו את הכיסאות, את התיקים, ואת רכבי השרד — והלכו." },
     public: { verdict: "העם איבד אמון", reason: "הרחוב ניצח. יצאת מהלשכה דרך הדלת האחורית, בלי צילומים." },
-    budget: { verdict: "הקופה התרוקנה", reason: "אין כסף. אפילו הקפה בישיבת הממשלה עבר לתשלום." }
+    budget: { verdict: "הקופה התרוקנה", reason: "אין כסף. אפילו הקפה בישיבת הממשלה עבר לתשלום." },
+    overreach: { verdict: "פיזרת לבחירות מוקדמות", reason: "היית חזק מדי, בטוח מדי. הלכת לבחירות בראש שקט — וחזרת עם 40% פחות." }
   };
   var TITLES = {
-    coalition: ["מפרק הקואליציות", "אמן ההבטחות", "זה שנתנו לו יותר מדי"],
-    public: ["המנואץ", "אויב הרחוב", "זה שלא הקשיב"],
-    budget: ["פושט הרגל", "מפזר הכספים", "זה שגמר את הקופה"]
+    coalition: ["מפרק הקואליציות", "אמן ההבטחות", "זה שנתנו לו יותר מדי", "קצר הנשימה", "מלך הרוטציה", "האיש של יום אחד בכנסת"],
+    public: ["המנואץ", "אויב הרחוב", "זה שלא הקשיב", "שר הצנע", "מי-שהיה", "האויב מספר אחת של הכיכר"],
+    budget: ["פושט הרגל", "מפזר הכספים", "זה שגמר את הקופה", "אלוף הגירעון", "השר שהדפיס", "מוכר הנכסים הלאומיים"],
+    overreach: ["השאפתן", "שיכור מכוח", "זה שקרא לבחירות", "הקיסר של רגע", "האיש שהאמין לסקרים", "יותר מדי, מהר מדי"]
   };
   function tierPrefix(d) { if (d < 80) return "כהונת בזק — "; if (d >= 500) return "האגדה — "; if (d >= 260) return "הוותיק — "; return ""; }
+  // אחוזון קשיח (מבוסס תחושת קושי, לא דאטה אמיתי — עד שיהיה לוח מובילים)
+  function percentileBeat(d) {
+    if (d < 60) return 18; if (d < 100) return 41; if (d < 150) return 58;
+    if (d < 200) return 71; if (d < 300) return 83; if (d < 400) return 90;
+    if (d < 500) return 94; if (d < 730) return 97; return 99;
+  }
+  function personalBest(d) {
+    var best = 0;
+    try { best = parseInt(localStorage.getItem("cs_best") || "0", 10) || 0; } catch (e) {}
+    var isNew = d > best;
+    if (isNew) { try { localStorage.setItem("cs_best", String(d)); } catch (e) {} }
+    return { best: Math.max(best, d), isNew: isNew };
+  }
   function rankLine(d) {
     if (d < 60) return "כהונת בזק. הקואליציה לא הספיקה להתחמם.";
     if (d < 150) return "שרדת — אבל בקושי. עוד ניסיון?";
@@ -223,22 +239,120 @@
     $("end-days").textContent = state.days.toLocaleString("he-IL");
     $("end-rank").textContent = rankLine(state.days);
     var pool = TITLES[cause];
-    $("end-title").textContent = tierPrefix(state.days) + '"' + pool[rint(pool.length)] + '"';
+    state.title = tierPrefix(state.days) + '"' + pool[rint(pool.length)] + '"';
+    $("end-title").textContent = state.title;
+
+    var pct = percentileBeat(state.days);
+    var pb = personalBest(state.days);
+    state.pct = pct;
+    var stats = "שרדת יותר מ-" + pct + "% מהשחקנים";
+    stats += pb.isNew ? "   ·   שיא אישי חדש" : ("   ·   השיא שלך: " + pb.best.toLocaleString("he-IL") + " ימים");
+    $("end-stats").textContent = stats;
+
     $("share-hint").textContent = "";
     show("screen-end");
+    drawShareCard(cause, pct); // מכין כרטיס PNG לשיתוף
   }
 
   /* ---------- שיתוף ---------- */
   function shareText() {
-    var word = { coalition: "השותפים ברחו", public: "העם התקומם", budget: "נגמר הכסף" }[state.cause];
-    return "שרדתי " + state.days.toLocaleString("he-IL") + " ימים כראש ממשלה. נפלתי כי " +
-      word + ". התואר שלי: " + $("end-title").textContent + ". תשרוד יותר ממני?";
+    var title = state.title || $("end-title").textContent;
+    var d = state.days.toLocaleString("he-IL");
+    return title + " — כך כינו אותי אחרי " + d + " ימים כראש ממשלה, ושרדתי יותר מ-" +
+      (state.pct || 0) + "% מהשחקנים. תשרוד יותר ממני?";
   }
+
+  /* מצייר כרטיס PNG לשיתוף (מאוחסן ב-state.shareBlob/shareCanvas) */
+  function drawRing(x, cx, cy, r, val, color) {
+    x.lineWidth = 18; x.lineCap = "round";
+    x.strokeStyle = "rgba(255,255,255,.10)";
+    x.beginPath(); x.arc(cx, cy, r, 0, 2 * Math.PI); x.stroke();
+    x.strokeStyle = color;
+    var start = -Math.PI / 2;
+    x.beginPath(); x.arc(cx, cy, r, start, start + 2 * Math.PI * (Math.max(0, val) / 100)); x.stroke();
+    x.fillStyle = "#fff"; x.textAlign = "center"; x.textBaseline = "middle";
+    x.font = "800 56px Rubik,Heebo,sans-serif";
+    x.fillText(String(Math.round(val)), cx, cy + 2);
+    x.textBaseline = "alphabetic";
+  }
+  function drawShareCard(cause, pct) {
+    try {
+      var W = 1080, H = 1350;
+      var cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+      var x = cv.getContext("2d");
+      var g = x.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, "#182633"); g.addColorStop(1, "#0f1922");
+      x.fillStyle = g; x.fillRect(0, 0, W, H);
+      x.strokeStyle = "rgba(255,255,255,.12)"; x.lineWidth = 2; x.strokeRect(40, 40, W - 80, H - 80);
+      x.textAlign = "center"; x.direction = "rtl";
+
+      x.fillStyle = "#8fa3b3"; x.font = "600 36px Rubik,Heebo,sans-serif";
+      x.fillText("שרוד את הקואליציה", W / 2, 140);
+      x.fillStyle = "#ef4d6b"; x.font = "800 54px Rubik,Heebo,sans-serif";
+      x.fillText(CAUSE[cause].verdict, W / 2, 230);
+
+      x.fillStyle = "#fff"; x.font = "900 230px Rubik,Heebo,sans-serif";
+      x.fillText(state.days.toLocaleString("he-IL"), W / 2, 490);
+      x.fillStyle = "#8fa3b3"; x.font = "600 42px Rubik,Heebo,sans-serif";
+      x.fillText("ימים בשלטון", W / 2, 555);
+
+      x.fillStyle = "#c7b8ff"; x.font = "800 48px Rubik,Heebo,sans-serif";
+      var title = state.title || "";
+      if (x.measureText(title).width > W - 160) x.font = "800 40px Rubik,Heebo,sans-serif";
+      x.fillText(title, W / 2, 660);
+
+      var meters = [
+        { k: "coalition", c: "#22b07d", n: "קואליציה" },
+        { k: "public", c: "#3d8bf0", n: "ציבור" },
+        { k: "budget", c: "#f0a13d", n: "תקציב" }
+      ];
+      var cy = 900, r = 92, third = W / 3;
+      meters.forEach(function (m, i) {
+        var cx = third * (i + 0.5);
+        drawRing(x, cx, cy, r, state.meters[m.k], m.c);
+        x.fillStyle = "#8fa3b3"; x.font = "600 36px Rubik,Heebo,sans-serif";
+        x.fillText(m.n, cx, cy + r + 58);
+      });
+
+      x.fillStyle = "#fff"; x.font = "700 44px Rubik,Heebo,sans-serif";
+      x.fillText("שרדת יותר מ-" + pct + "% מהשחקנים", W / 2, 1180);
+      x.fillStyle = "#6f8496"; x.font = "600 34px Rubik,Heebo,sans-serif";
+      x.fillText("engelshtein-g.github.io/coalition-survivor", W / 2, 1280);
+
+      state.shareCanvas = cv;
+      state.shareBlob = null;
+      if (cv.toBlob) cv.toBlob(function (b) { state.shareBlob = b; }, "image/png");
+    } catch (e) { state.shareCanvas = null; state.shareBlob = null; }
+  }
+
   function doShare() {
     var text = shareText(), url = location.href.split("#")[0];
-    if (navigator.share) { navigator.share({ title: "שרוד את הקואליציה", text: text, url: url }).catch(function () {}); }
-    else if (navigator.clipboard) { navigator.clipboard.writeText(text + " " + url).then(function () { $("share-hint").textContent = "הועתק ללוח — הדבק ושתף."; }, function () { $("share-hint").textContent = text; }); }
-    else { $("share-hint").textContent = text; }
+    // 1) עדיף: שיתוף עם תמונת הכרטיס (מובייל)
+    if (state.shareBlob && navigator.canShare) {
+      try {
+        var file = new File([state.shareBlob], "coalition-survivor.png", { type: "image/png" });
+        if (navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], text: text, url: url }).catch(function () {});
+          return;
+        }
+      } catch (e) {}
+    }
+    // 2) שיתוף טקסט מקורי (מובייל בלי קבצים)
+    if (navigator.share) { navigator.share({ title: "שרוד את הקואליציה", text: text, url: url }).catch(function () {}); return; }
+    // 3) דסקטופ: מוריד את הכרטיס + מעתיק טקסט
+    if (state.shareCanvas) {
+      try {
+        var a = document.createElement("a");
+        a.href = state.shareCanvas.toDataURL("image/png");
+        a.download = "coalition-survivor.png"; a.click();
+        $("share-hint").textContent = "הכרטיס ירד למכשיר — שתף אותו.";
+      } catch (e) {}
+    }
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text + " " + url).then(function () {
+        if (!$("share-hint").textContent) $("share-hint").textContent = "הטקסט הועתק ללוח — הדבק ושתף.";
+      }, function () { if (!$("share-hint").textContent) $("share-hint").textContent = text; });
+    } else if (!$("share-hint").textContent) { $("share-hint").textContent = text; }
   }
 
   /* ---------- חיבור ---------- */
