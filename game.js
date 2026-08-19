@@ -20,6 +20,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var clamp = function (n) { return Math.max(0, Math.min(100, n)); };
   var rint = function (max) { return Math.floor(Math.random() * max); };
+  function track(name, data) { try { if (window.umami) window.umami.track(name, data); } catch (e) {} }
 
   function show(id) {
     var s = document.querySelectorAll(".screen");
@@ -52,6 +53,7 @@
 
   /* ---------- התחלה ---------- */
   function newGame() {
+    track("game_start");
     state = {
       meters: { coalition: START, public: START, budget: START },
       days: 0, current: null, locked: false,
@@ -214,6 +216,7 @@
   }
 
   function endGame(cause) {
+    track("game_over", { days: state.days, cause: cause });
     var c = CAUSE[cause];
     $("end-cause").textContent = c.verdict;
     $("end-reason").textContent = c.reason;
