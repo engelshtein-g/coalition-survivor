@@ -4,7 +4,7 @@
 
   var RING_C = 2 * Math.PI * 32;                 // היקף הטבעת (~201.06)
   var START = 55, LOW = 22;
-  var DRIFT = { coalition: -3, public: -3, budget: -2 }; // שחיקת שלטון (קואליציה נשחקת הכי מהר)
+  var DRIFT = { coalition: -4, public: -2, budget: -3 }; // שחיקת שלטון — מכויל לפילוח מוות מאוזן (~35/35/30)
   var METERS = ["coalition", "public", "budget"];
   var NAMES = { coalition: "קואליציה", public: "ציבור", budget: "תקציב" };
   var MILESTONES = [
@@ -171,7 +171,7 @@
     if (m.coalition <= 0) return "coalition";
     if (m.public <= 0) return "public";
     if (m.budget <= 0) return "budget";
-    if (m.coalition >= 96) return "overreach"; // חזק מדי → מפוצץ לבחירות מוקדמות בביטחון יתר
+    if (m.coalition >= 92) return "overreach"; // חזק מדי → מפוצץ לבחירות מוקדמות בביטחון יתר
     return null;
   }
 
@@ -210,11 +210,17 @@
     overreach: ["השאפתן", "שיכור מכוח", "זה שקרא לבחירות", "הקיסר של רגע", "האיש שהאמין לסקרים", "יותר מדי, מהר מדי"]
   };
   function tierPrefix(d) { if (d < 80) return "כהונת בזק — "; if (d >= 500) return "האגדה — "; if (d >= 260) return "הוותיק — "; return ""; }
-  // אחוזון קשיח (מבוסס תחושת קושי, לא דאטה אמיתי — עד שיהיה לוח מובילים)
+  // אחוזון מכויל מסימולציה של אוכלוסייה מעורבת (10k משחקים: נוטשים/אקראי/רגיל/מיומן).
+  // אינטרפולציה לינארית בין נקודות העקומה. חסום ב-99 (תמיד יש טוב ממך). מוחלף בדאטה אמיתי אם יהיה לוח מובילים.
   function percentileBeat(d) {
-    if (d < 60) return 18; if (d < 100) return 41; if (d < 150) return 58;
-    if (d < 200) return 71; if (d < 300) return 83; if (d < 400) return 90;
-    if (d < 500) return 94; if (d < 730) return 97; return 99;
+    var pts = [[0,0],[50,1],[80,5],[120,12],[160,23],[200,36],[250,54],[300,73],[360,89],[430,98],[520,99]];
+    for (var i = 1; i < pts.length; i++) {
+      if (d <= pts[i][0]) {
+        var a = pts[i-1], b = pts[i], f = (d - a[0]) / (b[0] - a[0]);
+        return Math.max(1, Math.round(a[1] + f * (b[1] - a[1])));
+      }
+    }
+    return 99;
   }
   function personalBest(d) {
     var best = 0;
