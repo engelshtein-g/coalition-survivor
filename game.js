@@ -328,7 +328,13 @@
       state.shareCanvas = cv;
       state.shareBlob = null;
       if (cv.toBlob) cv.toBlob(function (b) { state.shareBlob = b; }, "image/png");
-    } catch (e) { state.shareCanvas = null; state.shareBlob = null; }
+      // תצוגה מקדימה על מסך הסיום — שיראו בדיוק מה משתפים
+      var pimg = $("share-img"), pfig = $("share-preview");
+      if (pimg && pfig) { pimg.src = cv.toDataURL("image/png"); pfig.hidden = false; }
+    } catch (e) {
+      state.shareCanvas = null; state.shareBlob = null;
+      var f = $("share-preview"); if (f) f.hidden = true;
+    }
   }
 
   function doShare() {
