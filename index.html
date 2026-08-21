@@ -12,18 +12,18 @@
 <meta property="og:title" content="שרוד את הקואליציה" />
 <meta property="og:description" content="קיבלת ממשלה. כמה ימים תחזיק אותה? משחק הישרדות פוליטי סאטירי." />
 <meta property="og:url" content="https://engelshtein-g.github.io/coalition-survivor/" />
-<meta property="og:image" content="https://engelshtein-g.github.io/coalition-survivor/og-cover.png?v=8" />
+<meta property="og:image" content="https://engelshtein-g.github.io/coalition-survivor/og-cover.png?v=9" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:locale" content="he_IL" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="שרוד את הקואליציה" />
 <meta name="twitter:description" content="קיבלת ממשלה. כמה ימים תחזיק אותה?" />
-<meta name="twitter:image" content="https://engelshtein-g.github.io/coalition-survivor/og-cover.png?v=8" />
+<meta name="twitter:image" content="https://engelshtein-g.github.io/coalition-survivor/og-cover.png?v=9" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=Rubik:wght@400;500;600;700;800&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css?v=8" />
+<link rel="stylesheet" href="styles.css?v=9" />
 <script defer src="https://umami.178-105-161-132.nip.io/script.js" data-website-id="5780ba5e-644a-413a-896a-7c191c03461d"></script>
 </head>
 <body>
@@ -94,15 +94,32 @@
 
   <!-- ====== מסך משחק ====== -->
   <section id="screen-play" class="screen">
-    <button class="mutebtn" id="btn-mute" type="button" aria-label="קול">
-      <svg class="mutebtn__on" aria-hidden="true"><use href="#i-sound"/></svg>
-      <svg class="mutebtn__off" aria-hidden="true"><use href="#i-mute"/></svg>
-    </button>
-    <!-- מד ימים -->
+    <!-- מד ימים + דירוג -->
     <div class="daybar">
-      <span class="daybar__label">ימים בשלטון</span>
-      <span class="daybar__count" id="days">0</span>
+      <div class="daybar__top">
+        <div class="daybar__day">
+          <span class="daybar__label">ימים בשלטון</span>
+          <span class="daybar__count" id="days">0</span>
+        </div>
+        <button class="mutebtn" id="btn-mute" type="button" aria-label="קול">
+          <svg class="mutebtn__on" aria-hidden="true"><use href="#i-sound"/></svg>
+          <svg class="mutebtn__off" aria-hidden="true"><use href="#i-mute"/></svg>
+        </button>
+      </div>
+      <div class="prog">
+        <div class="prog__track">
+          <span class="prog__tick" style="inset-inline-start:25%"></span>
+          <span class="prog__tick" style="inset-inline-start:50%"></span>
+          <span class="prog__tick" style="inset-inline-start:75%"></span>
+          <span class="prog__tick" style="inset-inline-start:90%"></span>
+          <div class="prog__fill" id="prog-fill"></div>
+        </div>
+        <span class="prog__label" id="prog-label">מנצח 0% מהשחקנים</span>
+      </div>
     </div>
+
+    <!-- פופאפ אחוזון תוך כדי משחק -->
+    <div class="toast" id="toast" aria-hidden="true"></div>
 
     <!-- מדים -->
     <div class="gauges">
@@ -205,7 +222,7 @@
 
 </div>
 
-<script src="events.js?v=8"></script>
-<script src="game.js?v=8"></script>
+<script src="events.js?v=9"></script>
+<script src="game.js?v=9"></script>
 </body>
 </html>

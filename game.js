@@ -73,6 +73,28 @@
     flag.classList.remove("is-on"); return false;
   }
 
+  /* ---------- בר התקדמות + פופאפ אחוזון תוך כדי משחק ---------- */
+  var PCT_MARKS = [10, 25, 50, 75, 90];
+  function showToast(text) {
+    var el = $("toast"); if (!el) return;
+    el.textContent = text;
+    el.classList.remove("is-on"); void el.offsetWidth; el.classList.add("is-on");
+    clearTimeout(state.toastTimer);
+    state.toastTimer = setTimeout(function () { el.classList.remove("is-on"); }, 1900);
+  }
+  function updateProgress() {
+    var pct = percentileBeat(state.days);
+    var fill = $("prog-fill"), label = $("prog-label");
+    if (fill) fill.style.width = pct + "%";
+    if (label) label.textContent = "מנצח " + pct + "% מהשחקנים";
+    var crossed = 0;
+    for (var i = 0; i < PCT_MARKS.length; i++) {
+      if (pct >= PCT_MARKS[i] && state.pctMax < PCT_MARKS[i]) crossed = PCT_MARKS[i];
+    }
+    state.pctMax = Math.max(state.pctMax, pct);
+    if (crossed) { showToast("עברת יותר מ-" + crossed + "% מהשחקנים"); SFX.good(); }
+  }
+
   function show(id) {
     var s = document.querySelectorAll(".screen");
     for (var i = 0; i < s.length; i++) s[i].classList.remove("is-active");
@@ -111,12 +133,14 @@
       meters: { coalition: START, public: START, budget: START },
       days: 0, current: null, locked: false,
       forcedNext: null, usedOnce: {}, lastEv: null,
-      pending: null, lastMilestone: 0, cause: null
+      pending: null, lastMilestone: 0, cause: null, pctMax: 0
     };
     reshuffle();
     $("case-no").textContent = (24 + rint(3)) + "-" + (1000 + rint(9000));
     renderMeters(false);
     $("days").textContent = "0";
+    var toast = $("toast"); if (toast) toast.classList.remove("is-on");
+    updateProgress();
     show("screen-play");
     nextTurn();
   }
@@ -186,6 +210,7 @@
     });
     state.days += 12 + rint(22);
     $("days").textContent = state.days.toLocaleString("he-IL");
+    updateProgress();
 
     // הטבעות זזות + מספרים עפים, ומבזק חולף על המסך
     renderMeters(true);
