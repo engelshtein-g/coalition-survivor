@@ -22,6 +22,57 @@
   var rint = function (max) { return Math.floor(Math.random() * max); };
   function track(name, data) { try { if (window.umami) window.umami.track(name, data); } catch (e) {} }
 
+  /* ---------- סאונד (Web Audio — נוצר בקוד, בלי קבצים) ---------- */
+  var SFX = (function () {
+    var ctx = null, on = true;
+    try { on = localStorage.getItem("cs_mute") !== "1"; } catch (e) {}
+    function ac() { if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } return ctx; }
+    function tone(freq, dur, type, gain, slideTo, delay) {
+      if (!on) return; var c = ac(); if (!c) return;
+      var t0 = c.currentTime + (delay || 0);
+      var o = c.createOscillator(), g = c.createGain();
+      o.type = type || "sine"; o.frequency.setValueAtTime(freq, t0);
+      if (slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(1, slideTo), t0 + dur);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(gain || 0.14, t0 + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g); g.connect(c.destination); o.start(t0); o.stop(t0 + dur + 0.03);
+    }
+    function noise(dur, gain) {
+      if (!on) return; var c = ac(); if (!c) return;
+      var n = Math.floor(c.sampleRate * dur), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+      for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      var src = c.createBufferSource(), g = c.createGain();
+      src.buffer = buf; g.gain.value = gain || 0.12; src.connect(g); g.connect(c.destination); src.start();
+    }
+    return {
+      unlock: function () { var c = ac(); if (c && c.state === "suspended") { try { c.resume(); } catch (e) {} } },
+      on: function () { return on; },
+      toggle: function () { on = !on; try { localStorage.setItem("cs_mute", on ? "0" : "1"); } catch (e) {} return on; },
+      click: function () { tone(300, 0.05, "triangle", 0.09); },
+      good: function () { tone(520, 0.10, "sine", 0.11, 760); },
+      bad: function () { tone(280, 0.16, "sawtooth", 0.13, 150); },
+      heartbeat: function () { tone(72, 0.11, "sine", 0.24); tone(60, 0.13, "sine", 0.22, null, 0.17); },
+      milestone: function () { tone(560, 0.12, "sine", 0.12, 840); tone(840, 0.16, "sine", 0.11, 1180, 0.12); },
+      death: function () { tone(220, 0.7, "sawtooth", 0.20, 45); noise(0.6, 0.14); }
+    };
+  })();
+
+  function shake(strength) {
+    var f = document.querySelector(".frame"); if (!f) return;
+    f.classList.remove("shake-1", "shake-2"); void f.offsetWidth;
+    f.classList.add(strength >= 2 ? "shake-2" : "shake-1");
+  }
+
+  var DANGER_TXT = { coalition: "הקואליציה על סף פיצוץ", public: "הרחוב עולה על גדותיו", budget: "הקופה כמעט ריקה" };
+  function updateDanger() {
+    var flag = $("danger-flag"); if (!flag) return false;
+    var worstK = null, worstV = 101;
+    METERS.forEach(function (k) { if (state.meters[k] < worstV) { worstV = state.meters[k]; worstK = k; } });
+    if (worstV <= 15) { flag.textContent = DANGER_TXT[worstK]; flag.classList.add("is-on"); return true; }
+    flag.classList.remove("is-on"); return false;
+  }
+
   function show(id) {
     var s = document.querySelectorAll(".screen");
     for (var i = 0; i < s.length; i++) s[i].classList.remove("is-active");
@@ -54,6 +105,8 @@
   /* ---------- התחלה ---------- */
   function newGame() {
     track("game_start");
+    SFX.unlock();
+    var df = $("danger-flag"); if (df) df.classList.remove("is-on");
     state = {
       meters: { coalition: START, public: START, budget: START },
       days: 0, current: null, locked: false,
@@ -102,6 +155,7 @@
       var g = document.querySelector('.gauge[data-meter="' + k + '"]');
       if (v <= LOW) g.classList.add("is-low"); else g.classList.remove("is-low");
     });
+    updateDanger();
   }
 
   function flashDeltas(deltas) {
@@ -120,6 +174,7 @@
   function pick(idx) {
     if (state.locked) return;
     state.locked = true;
+    SFX.unlock(); SFX.click();
     var choice = state.current.choices[idx];
 
     // חישוב שינוי אמיתי (כולל שחיקה) לכל מד
@@ -135,6 +190,18 @@
     // הטבעות זזות + מספרים עפים, ומבזק חולף על המסך
     renderMeters(true);
     flashDeltas(deltas);
+
+    // juice: קול ורעד לפי עוצמת המכה
+    var worst = 0, best = 0;
+    METERS.forEach(function (k) { if (deltas[k] < worst) worst = deltas[k]; if (deltas[k] > best) best = deltas[k]; });
+    if (worst <= -12) { shake(2); SFX.bad(); }
+    else if (worst <= -7) { shake(1); SFX.bad(); }
+    else if (best >= 8) { SFX.good(); }
+    // פעימת לב כשמד קרוב לתהום
+    var danger = false;
+    METERS.forEach(function (k) { if (state.meters[k] <= 15) danger = true; });
+    if (danger) SFX.heartbeat();
+
     if (choice.then) state.forcedNext = choice.then;
     newsflash(choice.out || "וכך זה נמשך.", state.current.type === "breaking", deltas);
     state.nfTimer = setTimeout(proceed, 2700);
@@ -160,7 +227,12 @@
     clearTimeout(state.nfTimer);
     el.classList.remove("is-on");
     var dead = deadMeter();
-    if (dead) { state.cause = dead; setTimeout(function () { endGame(dead); }, 200); return; }
+    if (dead) {
+      state.cause = dead;
+      var df = $("danger-flag"); if (df) df.classList.remove("is-on");
+      SFX.death(); shake(2);
+      setTimeout(function () { endGame(dead); }, 350); return;
+    }
     var ms = crossedMilestone();
     if (ms) { showMilestone(ms); return; }
     nextTurn();
@@ -189,6 +261,7 @@
     $("ms-num").textContent = ms.d;
     $("ms-text").textContent = ms.t;
     var el = $("milestone");
+    SFX.milestone();
     el.classList.add("is-on");
     var done = false;
     var close = function () { if (done) return; done = true; el.classList.remove("is-on"); el.removeEventListener("click", close); setTimeout(nextTurn, 150); };
@@ -252,7 +325,7 @@
     var pb = personalBest(state.days);
     state.pct = pct;
     var stats = "שרדת יותר מ-" + pct + "% מהשחקנים";
-    stats += pb.isNew ? "   ·   שיא אישי חדש" : ("   ·   השיא שלך: " + pb.best.toLocaleString("he-IL") + " ימים");
+    stats += pb.isNew ? "   ·   שיא אישי חדש!" : ("   ·   השיא שלך: " + pb.best.toLocaleString("he-IL") + " ימים · תנקום?");
     $("end-stats").textContent = stats;
 
     $("share-hint").textContent = "";
@@ -375,5 +448,14 @@
     $("btn-again").addEventListener("click", function () { show("screen-start"); });
     $("btn-share").addEventListener("click", doShare);
     $("newsflash").addEventListener("click", proceed);
+    var mb = $("btn-mute");
+    if (mb) {
+      if (!SFX.on()) mb.classList.add("is-muted");
+      mb.addEventListener("click", function () {
+        var nowOn = SFX.toggle();
+        mb.classList.toggle("is-muted", !nowOn);
+        if (nowOn) { SFX.unlock(); SFX.good(); }
+      });
+    }
   });
 })();

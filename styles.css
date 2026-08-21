@@ -101,6 +101,53 @@ body{
 .gauge[data-meter="budget"] .ring__prog{stroke:var(--c-budget)}
 .gauge.is-low .ring__prog{stroke:var(--danger);animation:pulse 1.1s ease-in-out infinite}
 .gauge.is-low .ring__val{fill:var(--danger)}
+.gauge.is-low{animation:dangerPulse 1s ease-in-out infinite}
+@keyframes dangerPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+/* ===== juice: רעד מסך ===== */
+@keyframes shakeSmall{10%,90%{transform:translateX(-1px)}30%,70%{transform:translateX(2px)}50%{transform:translateX(-3px)}}
+@keyframes shakeBig{10%{transform:translate(-2px,1px)}30%{transform:translate(4px,-2px)}50%{transform:translate(-6px,2px)}70%{transform:translate(4px,-1px)}90%{transform:translate(-2px,1px)}}
+.frame.shake-1{animation:shakeSmall .28s ease}
+.frame.shake-2{animation:shakeBig .42s ease}
+
+/* ===== באנר סכנה ===== */
+#screen-play{position:relative}
+.danger-flag{
+  max-height:0;overflow:hidden;opacity:0;margin:0 2px;
+  background:linear-gradient(180deg,#ef4d6b,#d83557);color:#fff;
+  font-family:var(--sans);font-weight:800;font-size:13.5px;text-align:center;
+  border-radius:12px;letter-spacing:.01em;
+  transition:max-height .25s ease,opacity .25s ease,padding .25s ease,margin-bottom .25s ease;
+}
+.danger-flag.is-on{
+  max-height:52px;opacity:1;padding:10px 14px;margin-bottom:12px;
+  box-shadow:0 10px 22px -12px rgba(216,53,87,.9);
+  animation:flagPulse 1s ease-in-out infinite;
+}
+.danger-flag.is-on::before{
+  content:"";display:inline-block;vertical-align:middle;margin-inline-end:8px;position:relative;top:-1px;
+  border-inline:5px solid transparent;border-bottom:9px solid #fff;
+}
+@keyframes flagPulse{0%,100%{box-shadow:0 10px 22px -12px rgba(216,53,87,.9)}50%{box-shadow:0 10px 30px -8px rgba(216,53,87,1)}}
+
+/* ===== כפתור השתקה ===== */
+.mutebtn{
+  position:absolute;top:6px;left:6px;z-index:5;
+  width:34px;height:34px;padding:0;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card);border-radius:50%;box-shadow:var(--shadow-sm);
+  color:var(--ink-mute);transition:transform .15s ease,color .15s ease;
+}
+.mutebtn:hover{transform:translateY(-1px);color:var(--indigo)}
+.mutebtn:active{transform:translateY(0)}
+.mutebtn svg{width:18px;height:18px}
+.mutebtn__off{display:none}
+.mutebtn.is-muted{color:var(--ink-mute)}
+.mutebtn.is-muted .mutebtn__on{display:none}
+.mutebtn.is-muted .mutebtn__off{display:flex}
+@media (prefers-reduced-motion:reduce){
+  .frame.shake-1,.frame.shake-2,.gauge.is-low,.danger-flag.is-on{animation:none}
+}
 .gauge__name{display:flex;align-items:center;justify-content:center;gap:5px;font-size:12.5px;font-weight:500;color:var(--ink-soft)}
 .gauge__icon{width:15px;height:15px;color:var(--ink-mute);flex:none}
 @keyframes pulse{50%{opacity:.5}}
