@@ -338,14 +338,16 @@
       try {
         var file = new File([state.shareBlob], "coalition-survivor.png", { type: "image/png" });
         if (navigator.canShare({ files: [file] })) {
+          track("share", { via: "image", days: state.days });
           navigator.share({ files: [file], text: text, url: url }).catch(function () {});
           return;
         }
       } catch (e) {}
     }
     // 2) שיתוף טקסט מקורי (מובייל בלי קבצים)
-    if (navigator.share) { navigator.share({ title: "שרוד את הקואליציה", text: text, url: url }).catch(function () {}); return; }
+    if (navigator.share) { track("share", { via: "text", days: state.days }); navigator.share({ title: "שרוד את הקואליציה", text: text, url: url }).catch(function () {}); return; }
     // 3) דסקטופ: מוריד את הכרטיס + מעתיק טקסט
+    track("share", { via: "desktop", days: state.days });
     if (state.shareCanvas) {
       try {
         var a = document.createElement("a");
