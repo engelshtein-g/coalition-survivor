@@ -421,7 +421,7 @@
       x.fillStyle = "#fff"; x.font = "700 44px Rubik,Heebo,sans-serif";
       x.fillText("שרדת יותר מ-" + pct + "% מהשחקנים", W / 2, 1180);
       x.fillStyle = "#6f8496"; x.font = "600 34px Rubik,Heebo,sans-serif";
-      x.fillText("engelshtein-g.github.io/coalition-survivor", W / 2, 1280);
+      x.fillText("srod.engelshtein.org", W / 2, 1280);
 
       state.shareCanvas = cv;
       state.shareBlob = null;
